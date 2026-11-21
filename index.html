@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>دوام · WorkAttend</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1D3F73">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="دوام">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#EEF1F6; --surface:#FFFFFF; --surface-2:#F5F7FB; --line:#E2E6EE;
+  --ink:#101828; --ink-2:#475467; --ink-3:#8A94A6;
+  --navy:#1D3F73; --navy-deep:#122B52; --navy-soft:#E4ECF9; --on-navy:#FFFFFF;
+  --good:#1E7B4D; --good-soft:#E1F3E8; --warn:#A86A12; --warn-soft:#FBEFD6; --bad:#B8392A; --bad-soft:#FAE3DF;
+  --s-present:#1E7B4D; --s-absent:#B8392A; --s-sick:#C2620A; --s-leave:#2F5FB3; --s-annual:#0E7C86;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Arabic","Geeza Pro",Tahoma,sans-serif;
+  --r:16px; --shadow:0 1px 2px rgba(16,24,40,.06),0 8px 24px rgba(16,24,40,.06);
+}
+@media (prefers-color-scheme: dark){ :root{
+  --bg:#0B1220; --surface:#141C2B; --surface-2:#1B2436; --line:#27324A;
+  --ink:#EEF2F8; --ink-2:#B6C0D2; --ink-3:#7E8AA0;
+  --navy:#3D6DB8; --navy-deep:#1E3A66; --navy-soft:#1E2E4A;
+  --good:#5BC98C; --good-soft:#153826; --warn:#E0A94A; --warn-soft:#3B2C10; --bad:#F08A7C; --bad-soft:#3F1F1B;
+  --s-present:#2E9A63; --s-absent:#D4523F; --s-sick:#D9822B; --s-leave:#4C7FD6; --s-annual:#1E9AA5;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35); color-scheme:dark } }
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+input,textarea,select{font:inherit;color:var(--ink)}
+.stage{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.phone{width:100%;max-width:440px;height:min(860px,calc(100vh - 48px));min-height:640px;background:var(--surface);border-radius:32px;box-shadow:var(--shadow),0 0 0 8px var(--navy-deep);overflow:hidden;position:relative;display:flex;flex-direction:column}
+@media (max-width:520px){ .stage{padding:0;height:100%} .phone{max-width:none;height:100vh;height:100dvh;min-height:0;border-radius:0;box-shadow:none} }
+.app{flex:1;display:flex;flex-direction:column;min-height:0}
+.bar{display:flex;align-items:center;gap:8px;padding:14px 16px 8px;min-height:56px}
+.bar h1{font-size:20px;font-weight:800;margin:0;letter-spacing:-.01em}
+.bar .title-wrap{flex:1;min-width:0}
+.bar .sub{font-size:13px;color:var(--ink-3)}
+.icon-btn{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--ink-2);flex:none}
+.icon-btn:hover{background:var(--surface-2)}
+.icon-btn svg,.btn svg,.nav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+[dir="rtl"] .flip svg{transform:scaleX(-1)}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 16px 24px;display:flex;flex-direction:column;gap:12px}
+.nav{display:flex;border-top:1px solid var(--line);background:var(--surface);padding:6px 6px 10px}
+.nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:12px;font-size:11.5px;font-weight:700;color:var(--ink-3)}
+.nav button.on{color:var(--navy)} .nav button.on svg{stroke-width:2.3}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+.hero{background:linear-gradient(150deg,var(--navy) 0%,var(--navy-deep) 100%);color:var(--on-navy);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.hero .big{font-size:22px;font-weight:800;line-height:1.2}
+.hero .meta{font-size:13px;opacity:.85}
+h2{font-size:16px;font-weight:800;margin:0}
+.muted{color:var(--ink-2);font-size:13.5px} .tiny{color:var(--ink-3);font-size:12.5px}
+.notice{background:var(--warn-soft);color:var(--warn);border-radius:14px;padding:12px 14px;font-weight:700;font-size:13.5px}
+.notice.bad{background:var(--bad-soft);color:var(--bad)} .notice.good{background:var(--good-soft);color:var(--good)} .notice.info{background:var(--navy-soft);color:var(--navy)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px;border-radius:14px;font-weight:800;font-size:15px;padding:0 14px;transition:transform .06s ease}
+.btn:active{transform:scale(.985)}
+.btn.primary{background:var(--navy);color:var(--on-navy)} .btn.tonal{background:var(--navy-soft);color:var(--navy)}
+.btn.ghost{background:var(--surface-2);color:var(--ink-2)} .btn.danger{background:var(--bad-soft);color:var(--bad)}
+.btn.wa{background:#1FA855;color:#fff}
+.btn.sm{min-height:40px;font-size:13.5px;border-radius:12px;width:auto}
+.row{display:flex;gap:8px;align-items:center} .row>.btn{flex:1}
+.fab{position:absolute;inset-inline-end:16px;bottom:84px;width:56px;height:56px;border-radius:18px;background:var(--navy);color:#fff;display:grid;place-items:center;box-shadow:0 10px 24px rgba(29,63,115,.35);font-size:30px;line-height:1;z-index:5}
+.list{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);text-align:start;width:100%}
+.item:last-child{border-bottom:0} button.item:hover{background:var(--surface-2)}
+.item .body{flex:1;min-width:0} .item .t{font-weight:800;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .item .s{font-size:12.5px;color:var(--ink-2);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.avatar{width:40px;height:40px;border-radius:13px;background:var(--navy-soft);color:var(--navy);display:grid;place-items:center;font-weight:800;font-size:16px;flex:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 10px;font-size:12.5px;font-weight:800;white-space:nowrap;background:var(--surface-2);color:var(--ink-2)}
+.hero .chip{background:rgba(255,255,255,.14);color:#fff}
+.chip b{font-variant-numeric:tabular-nums}
+.sw{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
+.c-present{background:var(--s-present)} .c-absent{background:var(--s-absent)} .c-sick{background:var(--s-sick)} .c-leave{background:var(--s-leave)} .c-annual{background:var(--s-annual)} .c-none{background:var(--ink-3)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12.5px;font-weight:800;color:var(--ink-2)}
+.input{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:11px 13px;min-height:46px;font-size:15px}
+textarea.input{min-height:110px;resize:vertical;line-height:1.55}
+.seg{display:flex;gap:4px;background:var(--surface-2);padding:4px;border-radius:14px}
+.seg button{flex:1;min-height:38px;border-radius:10px;font-weight:800;font-size:13px;color:var(--ink-2)}
+.seg button.on{background:var(--surface);color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.att{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.att:last-child{border-bottom:0}
+.att .n{display:flex;align-items:center;gap:8px;font-weight:800}
+.att .n .s{font-weight:600;color:var(--ink-3);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st5{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.st5 button{min-height:40px;border-radius:10px;font-weight:800;font-size:12.5px;background:var(--surface-2);color:var(--ink-2);padding:0 2px;line-height:1.15}
+.st5 button.on{color:#fff}
+.st5 button.on.present{background:var(--s-present)} .st5 button.on.absent{background:var(--s-absent)} .st5 button.on.sick{background:var(--s-sick)} .st5 button.on.leave{background:var(--s-leave)} .st5 button.on.annual{background:var(--s-annual)}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0;width:100%;text-align:start}
+.switch{width:46px;height:28px;border-radius:999px;background:var(--line);position:relative;flex:none;transition:background .15s}
+.switch::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.switch.on{background:var(--good)} .switch.on::after{transform:translateX(18px)} [dir="rtl"] .switch.on::after{transform:translateX(-18px)}
+.overlay{position:absolute;inset:0;background:rgba(10,16,30,.45);display:flex;align-items:flex-end;z-index:20}
+.sheet{background:var(--surface);width:100%;max-height:92%;border-radius:22px 22px 0 0;padding:12px 16px 18px;display:flex;flex-direction:column;gap:10px;animation:up .18s ease-out;overflow-y:auto}
+.sheet.full{height:100%;max-height:100%;border-radius:0}
+.sheet .grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 4px;flex:none}
+.sheet h3{margin:0;font-size:17px;font-weight:800}
+@keyframes up{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}
+.toast{position:absolute;left:16px;right:16px;bottom:92px;background:var(--ink);color:var(--bg);border-radius:12px;padding:12px 14px;font-weight:700;font-size:14px;z-index:40;text-align:center;animation:up .15s ease-out}
+@media (prefers-reduced-motion:reduce){.sheet,.toast{animation:none}}
+.wa-prev{background:#0b141a;border-radius:14px;padding:12px;border:1px solid #1f2c34}
+.wa-prev .bubble{background:#005c4b;color:#e9edef;border-radius:10px;padding:9px 11px;font-size:14px;white-space:pre-wrap;line-height:1.5;unicode-bidi:plaintext;text-align:start}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.stat{background:var(--surface-2);border-radius:12px;padding:9px 4px;text-align:center}
+.stat b{display:block;font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+.stat span{font-size:11px;color:var(--ink-3);font-weight:800}
+table.rep{width:100%;border-collapse:collapse;font-size:13px}
+table.rep th,table.rep td{padding:8px 4px;border-bottom:1px solid var(--line);text-align:center;font-variant-numeric:tabular-nums}
+table.rep th:first-child,table.rep td:first-child{text-align:start;font-weight:700;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+table.rep tr.click{cursor:pointer} table.rep tr.click:hover{background:var(--surface-2)}
+.imp-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.imp-row input[type=checkbox]{width:20px;height:20px;flex:none;accent-color:var(--navy)}
+.imp-row .body{flex:1;min-width:0}
+.tag{font-size:11px;font-weight:800;border-radius:6px;padding:1px 6px;background:var(--warn-soft);color:var(--warn)}
+.datebar{display:flex;align-items:center;gap:6px}
+.empty{text-align:center;padding:28px 12px;color:var(--ink-2);display:flex;flex-direction:column;gap:12px;align-items:center}
+.sync-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--ink-3)}
+.sync-dot.ok{background:var(--good)} .sync-dot.err{background:var(--bad)} .sync-dot.busy{background:var(--warn)}
+.ltr{direction:ltr;unicode-bidi:plaintext}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="stage"><div class="phone"><div class="app" id="app"></div></div></div>
+<input type="file" id="fileImport" class="hidden" accept=".csv,.tsv,.txt,.xlsx,.xls,.xlsm,.ods,.vcf,.json,text/*,application/*">
+<input type="file" id="fileRestore" class="hidden" accept=".json,application/json">
+<script>
+"use strict";
+/* Public address of the web version (used for setup links shared from the Android app).
+   If the repo moves to a new owner, update this one line. */
+window.WEB_URL = window.WEB_URL || "https://dragonemprorx90.github.io/workattend/";
+
+/* ================= constants & i18n ================= */
+const STATUSES = ["present","absent","sick","leave","annual"];
+const ST = {
+  present:{ar:"حضور",en:"Present",icon:"✅"},
+  absent:{ar:"غياب",en:"Absent",icon:"❌"},
+  sick:{ar:"مرضية",en:"Sick leave",short:"Sick",icon:"🤒"},
+  leave:{ar:"إجازة",en:"Leave",icon:"📅"},
+  annual:{ar:"سنوية",en:"Annual leave",short:"Annual",icon:"🏖️"},
+};
+const WD = {ar:["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"],en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]};
+const MO = {ar:["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"],en:["January","February","March","April","May","June","July","August","September","October","November","December"]};
+
+const T = {
+ar:{appName:"دوام",today:"الحضور",people:"الموظفين",msg:"رسالة",reports:"التقارير",settings:"الإعدادات",
+ notMarked:"غير محدد",marked:(n,m)=>`تم تحديد ${n} من ${m}`,restPresent:"الباقي حضور",search:"بحث…",
+ noEmp:"لا يوجد موظفين بعد.",addEmp:"إضافة موظف",importList:"استيراد قائمة",sendSummary:"إرسال ملخص اليوم",
+ empCount:n=>`${n} موظف`,name:"الاسم",phone:"رقم الهاتف",title:"المسمى الوظيفي",dept:"القسم",notes:"ملاحظات",
+ save:"حفظ",cancel:"إلغاء",del:"حذف",edit:"تعديل",editEmp:"تعديل موظف",confirmDel:n=>`حذف ${n}؟ سجل حضوره السابق يبقى في التقارير.`,
+ deleted:"تم الحذف",saved:"تم الحفظ",nameReq:"اكتب الاسم",thisMonth:"هذا الشهر",recent:"آخر السجلات",noRecords:"لا توجد سجلات",
+ impTitle:"استيراد موظفين",impHint:"اختر ملف Excel أو CSV أو جهات اتصال (vcf) أو نص — أو الصق قائمة الأسماء.",chooseFile:"اختيار ملف",pasteList:"لصق قائمة",
+ pasteHint:"اسم في كل سطر. يمكن إضافة الرقم بعد فاصلة: أحمد علي, 0501234567",readList:"قراءة القائمة",
+ found:n=>`وجدنا ${n}`,exists:"موجود",importN:n=>`استيراد ${n}`,imported:n=>`تمت إضافة ${n} موظف`,nothingFound:"لم نجد أسماء في هذا الملف",
+ selAll:"تحديد الكل",selNone:"إلغاء التحديد",fileErr:"تعذّر قراءة الملف",
+ writeMsg:"اكتب رسالتك بالعربي أو الإنجليزي",msgPh:"مثال: الاجتماع غداً الساعة 9 صباحاً في قاعة الاجتماعات",
+ makeBoth:"عربي + إنجليزي",translating:"جاري الترجمة…",arText:"النص العربي",enText:"النص الإنجليزي",
+ needServer:"الترجمة تحتاج الاتصال بقاعدة البيانات المشتركة. اكتب النص الآخر بنفسك أو اتصل من الإعدادات.",
+ trErr:"تعذّرت الترجمة — اكتب النص الآخر بنفسك.",addSummary:"إضافة ملخص الحضور",summaryOf:d=>`ملخص يوم ${d}`,
+ preview:"معاينة",sendTo:"الإرسال إلى",toGroup:"مجموعة / محادثة تختارها في واتساب",toNumber:n=>`المدير: ${n}`,change:"تغيير",
+ openWa:"فتح واتساب",copy:"نسخ النص",copied:"تم النسخ",didSend:"هل أرسلت الرسالة في واتساب؟",yesSent:"نعم، أُرسلت",notYet:"ليس بعد",
+ sentLog:"الرسائل المرسلة",noSent:"لم تُرسل رسائل بعد",reuse:"نسخ",emptyMsg:"اكتب رسالة أو فعّل ملخص الحضور",
+ days:"الأيام",perEmp:"حسب الموظف",exportCsv:"تصدير Excel (CSV)",noData:"لا توجد بيانات لهذا الشهر",exported:"تم حفظ الملف",
+ shared:"قاعدة البيانات المشتركة",connected:"متصل",notConnected:"غير متصل — البيانات على هذا الجهاز فقط",syncErrS:"خطأ في المزامنة",
+ lastSync:w=>`آخر مزامنة: ${w}`,never:"لم تتم",syncNow:"مزامنة الآن",serverUrl:"رابط الخادم (Google Apps Script)",pin:"الرقم السري",
+ connect:"اتصال",disconnect:"قطع الاتصال",shareSetup:"مشاركة رابط الإعداد",pasteSetup:"لصق رمز الإعداد",setupCode:"رمز الإعداد",
+ badPin:"الرقم السري غير صحيح",offline:"لا يوجد إنترنت — ستتم المزامنة لاحقاً",badUrl:"الرابط غير صحيح — يجب أن ينتهي بـ /exec",badCode:"رمز الإعداد غير صحيح",
+ connOk:"تم الاتصال والمزامنة",syncing:"جاري المزامنة…",synced:"تمت المزامنة",
+ waDest:"واتساب",destGroup:"مجموعة",destNumber:"رقم",number:"رقم المدير",cc:"رمز الدولة",numHint:"يُفتح واتساب مباشرة على هذه المحادثة.",groupHint:"يفتح واتساب وتختار المجموعة أو المحادثة.",
+ defSummary:"إضافة ملخص الحضور تلقائياً",language:"لغة التطبيق",auto:"الهاتف",backup:"نسخة احتياطية",saveBackup:"حفظ ملف نسخة احتياطية",restoreBackup:"استرجاع من ملف",
+ restored:"تم الاسترجاع",restoreConfirm:"سيتم دمج بيانات الملف مع بيانات هذا الجهاز. متابعة؟",erase:"مسح بيانات هذا الجهاز",eraseConfirm:"مسح كل البيانات من هذا الجهاز؟ (البيانات في Google Sheet تبقى)",
+ about:"التطبيق لا يحتوي على بيانات شخصية لأحد. البيانات المشتركة محفوظة في Google Sheet الخاص بمالك الخادم، ويمكن نقل ملكيته لشخص آخر في أي وقت.",
+ welcome:"أهلاً بك في دوام",welcomeHint:"تطبيق حضور الموظفين. للمزامنة بين عدة أجهزة أدخل رابط الخادم والرقم السري من المسؤول.",
+ useLocal:"الاستخدام بدون مزامنة (هذا الجهاز فقط)",orPaste:"أو الصق رمز الإعداد",handover:"نقل الملكية",
+ handoverText:"1) انقل ملكية ملف Google Sheet للمالك الجديد من Google Drive.\n2) المالك الجديد: Extensions ← Apps Script ← Deploy ← New deployment (Web app، Anyone).\n3) يضع الرابط الجديد هنا ثم «مشاركة رابط الإعداد» لباقي الأجهزة.",
+ justNow:"الآن",minAgo:m=>`قبل ${m} د`,hrAgo:h=>`قبل ${h} س`,setupApplied:"تم تطبيق الإعداد",
+ unknownEmp:"(موظف محذوف)",prev:"السابق",next:"التالي",todayBtn:"اليوم",
+ setupShareText:(u,c)=>`دوام — إعداد التطبيق\nافتح الرابط: ${u}\nأو الصق هذا الرمز في الإعدادات:\n${c}`},
+en:{appName:"WorkAttend",today:"Attendance",people:"Employees",msg:"Message",reports:"Reports",settings:"Settings",
+ notMarked:"Not marked",marked:(n,m)=>`${n} of ${m} marked`,restPresent:"Rest present",search:"Search…",
+ noEmp:"No employees yet.",addEmp:"Add employee",importList:"Import list",sendSummary:"Send today's summary",
+ empCount:n=>`${n} employees`,name:"Name",phone:"Phone",title:"Job title",dept:"Department",notes:"Notes",
+ save:"Save",cancel:"Cancel",del:"Delete",edit:"Edit",editEmp:"Edit employee",confirmDel:n=>`Delete ${n}? Their past attendance stays in the reports.`,
+ deleted:"Deleted",saved:"Saved",nameReq:"Enter a name",thisMonth:"This month",recent:"Recent records",noRecords:"No records",
+ impTitle:"Import employees",impHint:"Choose an Excel, CSV, contacts (vcf) or text file — or paste a list of names.",chooseFile:"Choose file",pasteList:"Paste a list",
+ pasteHint:"One name per line. Add a number after a comma: Ahmed Ali, 0501234567",readList:"Read list",
+ found:n=>`Found ${n}`,exists:"exists",importN:n=>`Import ${n}`,imported:n=>`${n} employees added`,nothingFound:"No names found in this file",
+ selAll:"Select all",selNone:"Select none",fileErr:"Couldn't read the file",
+ writeMsg:"Write your message in Arabic or English",msgPh:"e.g. Meeting tomorrow at 9 AM in the meeting room",
+ makeBoth:"Arabic + English",translating:"Translating…",arText:"Arabic text",enText:"English text",
+ needServer:"Translation needs the shared database. Type the other language yourself, or connect in Settings.",
+ trErr:"Translation failed — type the other language yourself.",addSummary:"Add attendance summary",summaryOf:d=>`Summary for ${d}`,
+ preview:"Preview",sendTo:"Send to",toGroup:"A group / chat you pick in WhatsApp",toNumber:n=>`Manager: ${n}`,change:"Change",
+ openWa:"Open WhatsApp",copy:"Copy text",copied:"Copied",didSend:"Did you send it in WhatsApp?",yesSent:"Yes, sent",notYet:"Not yet",
+ sentLog:"Sent messages",noSent:"No messages sent yet",reuse:"Copy",emptyMsg:"Write a message or turn on the attendance summary",
+ days:"Days",perEmp:"By employee",exportCsv:"Export Excel (CSV)",noData:"No data for this month",exported:"File saved",
+ shared:"Shared database",connected:"Connected",notConnected:"Not connected — data stays on this device",syncErrS:"Sync error",
+ lastSync:w=>`Last sync: ${w}`,never:"never",syncNow:"Sync now",serverUrl:"Server link (Google Apps Script)",pin:"PIN",
+ connect:"Connect",disconnect:"Disconnect",shareSetup:"Share setup link",pasteSetup:"Paste setup code",setupCode:"Setup code",
+ badPin:"Wrong PIN",offline:"No internet — will sync later",badUrl:"Invalid link — it must end with /exec",badCode:"Invalid setup code",
+ connOk:"Connected and synced",syncing:"Syncing…",synced:"Synced",
+ waDest:"WhatsApp",destGroup:"Group",destNumber:"Number",number:"Manager's number",cc:"Country code",numHint:"WhatsApp opens straight to this chat.",groupHint:"WhatsApp opens and you pick the group or chat.",
+ defSummary:"Add attendance summary by default",language:"App language",auto:"Phone",backup:"Backup",saveBackup:"Save backup file",restoreBackup:"Restore from file",
+ restored:"Restored",restoreConfirm:"The file's data will be merged with this device's data. Continue?",erase:"Erase data on this device",eraseConfirm:"Erase all data from this device? (Data in the Google Sheet stays.)",
+ about:"The app contains nobody's personal details. Shared data lives in the server owner's Google Sheet, and ownership can be transferred to someone else at any time.",
+ welcome:"Welcome to WorkAttend",welcomeHint:"Employee attendance. To sync between several devices, enter the server link and PIN from your admin.",
+ useLocal:"Use without sync (this device only)",orPaste:"or paste a setup code",handover:"Handover",
+ handoverText:"1) Transfer ownership of the Google Sheet to the new owner in Google Drive.\n2) New owner: Extensions → Apps Script → Deploy → New deployment (Web app, Anyone).\n3) Put the new link here, then “Share setup link” with the other devices.",
+ justNow:"just now",minAgo:m=>`${m} min ago`,hrAgo:h=>`${h} h ago`,setupApplied:"Setup applied",
+ unknownEmp:"(deleted employee)",prev:"Previous",next:"Next",todayBtn:"Today",
+ setupShareText:(u,c)=>`WorkAttend — app setup\nOpen: ${u}\nor paste this code in Settings:\n${c}`},
+};
+
+/* ================= helpers ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = p => p + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const pad = n => String(n).padStart(2, "0");
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseYmd = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const addDays = (s, n) => { const d = parseYmd(s); d.setDate(d.getDate() + n); return ymd(d); };
+const normName = s => String(s || "").toLowerCase().replace(/[ً-ٰٟ]/g, "").replace(/[أإآ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي").replace(/\s+/g, " ").trim();
+const digits = s => String(s || "").replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "");
+const isArabicText = s => (String(s).match(/[؀-ۿ]/g) || []).length >= (String(s).match(/[A-Za-z]/g) || []).length;
+function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+function load(k, def) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? def : v; } catch (e) { return def; } }
+
+/* ================= state ================= */
+const DEF_SETTINGS = { lang: "auto", server: "", pin: "", setupDone: false, dest: "group", waNumber: "", cc: "971", defSummary: false };
+const S = Object.assign({}, DEF_SETTINGS, load("wa.settings", {}));
+const D = Object.assign({ employees: {}, attendance: {}, messages: {} }, load("wa.data", {}));
+const DIRTY = Object.assign({ employees: {}, attendance: {}, messages: {} }, load("wa.dirty", {}));
+const META = Object.assign({ since: 0, lastSync: 0, err: "" }, load("wa.meta", {}));
+const UI = { form: null, tab: "today", date: ymd(new Date()), month: ymd(new Date()).slice(0, 7), q: "", pq: "", overlay: null, toast: null, msg: { src: "", ar: "", en: "", summary: S.defSummary, busy: false, note: "" }, syncing: false };
+
+const lang = () => S.lang === "auto" ? ((navigator.language || "ar").toLowerCase().startsWith("en") ? "en" : "ar") : S.lang;
+const t = (k, ...a) => { const v = T[lang()][k]; return typeof v === "function" ? v(...a) : (v == null ? k : v); };
+const stLabel = (s, l = lang()) => l === "ar" ? ST[s].ar : (ST[s].short || ST[s].en);
+
+function saveAll() { store("wa.settings", S); store("wa.data", D); store("wa.dirty", DIRTY); store("wa.meta", META); }
+function put(table, row) {
+  row.updatedAt = Math.max(Date.now(), (D[table][row.id] && D[table][row.id].updatedAt || 0) + 1);
+  D[table][row.id] = row; DIRTY[table][row.id] = row.updatedAt; saveAll(); Sync.soon();
+}
+const employees = () => Object.values(D.employees).filter(e => !e.deletedAt).sort((a, b) => String(a.name).localeCompare(String(b.name), "ar"));
+const attOf = (date, empId) => { const r = D.attendance[date + "|" + empId]; return r && !r.deletedAt ? r.status : null; };
+function setAtt(date, emp, status) {
+  const id = date + "|" + emp.id;
+  const old = D.attendance[id] || { id, empId: emp.id, date };
+  put("attendance", Object.assign({}, old, { status: status || null, empName: emp.name, deletedAt: null }));
+}
+function dayCounts(date) {
+  const c = { present: 0, absent: 0, sick: 0, leave: 0, annual: 0, none: 0 };
+  const names = { present: [], absent: [], sick: [], leave: [], annual: [] };
+  for (const e of employees()) { const s = attOf(date, e.id); if (s) { c[s]++; names[s].push(e.name); } else c.none++; }
+  return { c, names };
+}
+
+/* ================= date / text formatting ================= */
+function fmtDate(s, l = lang()) { const d = parseYmd(s); return `${WD[l][d.getDay()]} ${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`; }
+function fmtMonth(m, l = lang()) { const [y, mo] = m.split("-").map(Number); return `${MO[l][mo - 1]} ${y}`; }
+function ago(ts) { if (!ts) return t("never"); const m = Math.round((Date.now() - ts) / 60000); if (m < 1) return t("justNow"); if (m < 60) return t("minAgo", m); const h = Math.round(m / 60); if (h < 48) return t("hrAgo", h); return new Date(ts).toLocaleDateString(); }
+
+function summaryText(date, l) {
+  const { c, names } = dayCounts(date);
+  const lines = [l === "ar" ? `📋 ملخص الحضور — ${fmtDate(date, "ar")}` : `📋 Attendance — ${fmtDate(date, "en")}`];
+  for (const s of STATUSES) {
+    if (s !== "present" && !c[s]) continue;
+    let line = `${ST[s].icon} ${l === "ar" ? ST[s].ar : ST[s].en}: ${c[s]}`;
+    if (s !== "present" && names[s].length) line += ` — ${names[s].join(l === "ar" ? "، " : ", ")}`;
+    lines.push(line);
+  }
+  if (c.none) lines.push(l === "ar" ? `⏳ غير محدد: ${c.none}` : `⏳ Not marked: ${c.none}`);
+  lines.push(l === "ar" ? `👥 المجموع: ${employees().length}` : `👥 Total: ${employees().length}`);
+  return lines.join("\n");
+}
+function hybridText() {
+  const m = UI.msg, ar = (m.ar || "").trim(), en = (m.en || "").trim();
+  const arPart = [ar, m.summary ? summaryText(UI.date, "ar") : ""].filter(Boolean).join("\n\n");
+  const enPart = [en, m.summary ? summaryText(UI.date, "en") : ""].filter(Boolean).join("\n\n");
+  if (!arPart && !enPart) return "";
+  if (!enPart) return arPart; if (!arPart) return enPart;
+  return arPart + "\n\n━━━━━━━━━━\n\n" + enPart;
+}
+
+/* ================= sync with Google Apps Script ================= */
+class ApiError extends Error { constructor(code, msg) { super(msg || code); this.code = code; } }
+const TABLES = ["employees", "attendance", "messages"];
+const Sync = {
+  timer: null,
+  enabled() { return !!(S.server && S.pin); },
+  async api(body, server = S.server, pin = S.pin) {
+    let res;
+    try {
+      res = await fetch(server, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(Object.assign({}, body, { pin })), redirect: "follow" });
+    } catch (e) { throw new ApiError("OFFLINE"); }
+    let j; try { j = await res.json(); } catch (e) { throw new ApiError("BAD_SERVER", "HTTP " + res.status); }
+    if (j && j.error) throw new ApiError(j.error, j.message);
+    return j;
+  },
+  soon() { clearTimeout(this.timer); if (this.enabled()) this.timer = setTimeout(() => this.run(), 1500); },
+  async run(manual) {
+    if (!this.enabled() || UI.syncing) return false;
+    UI.syncing = true; paintSync();
+    try {
+      let since = META.since, first = true;
+      const pending = {}; TABLES.forEach(tb => pending[tb] = Object.keys(DIRTY[tb]));
+      while (first || TABLES.some(tb => pending[tb].length)) {
+        first = false;
+        const push = {}, sent = {}; let budget = 400;
+        for (const tb of TABLES) {
+          const ids = pending[tb].splice(0, budget); budget -= ids.length;
+          push[tb] = ids.map(id => D[tb][id]).filter(Boolean); sent[tb] = ids.map(id => [id, DIRTY[tb][id]]);
+        }
+        const r = await this.api({ action: "sync", since, push });
+        for (const tb of TABLES) {
+          for (const [id, at] of sent[tb]) if (DIRTY[tb][id] === at) delete DIRTY[tb][id];
+          for (const row of r[tb] || []) {
+            const loc = D[tb][row.id];
+            if (!loc || Number(row.updatedAt) >= Number(loc.updatedAt || 0)) {
+              if (tb === "attendance" && loc && loc.empName) row.empName = loc.empName;
+              D[tb][row.id] = row;
+              if (DIRTY[tb][row.id] && DIRTY[tb][row.id] <= Number(row.updatedAt)) delete DIRTY[tb][row.id];
+            }
+          }
+        }
+        since = r.now;
+      }
+      META.since = since; META.lastSync = Date.now(); META.err = "";
+      saveAll(); UI.syncing = false; render(); if (manual) toast(t("synced"));
+      return true;
+    } catch (e) {
+      META.err = e.code || "ERR"; saveAll(); UI.syncing = false; paintSync();
+      if (manual || e.code === "BAD_PIN") toast(errText(e));
+      return false;
+    }
+  },
+};
+function errText(e) { return e.code === "BAD_PIN" ? t("badPin") : e.code === "OFFLINE" ? t("offline") : `${t("syncErrS")}: ${e.message || e.code}`; }
+function paintSync() { const d = $("#syncDot"); if (d) d.className = "sync-dot " + syncClass(); }
+function syncClass() { if (!Sync.enabled()) return ""; if (UI.syncing) return "busy"; return META.err ? "err" : "ok"; }
+
+/* ================= setup codes (portable between owners / devices) ================= */
+function setupCode() { return btoa(unescape(encodeURIComponent(JSON.stringify({ u: S.server, p: S.pin })))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
+function readSetupCode(code) {
+  try {
+    code = String(code).trim().replace(/^.*#setup=/, "").replace(/-/g, "+").replace(/_/g, "/");
+    while (code.length % 4) code += "=";
+    const o = JSON.parse(decodeURIComponent(escape(atob(code))));
+    if (o && o.u && o.p) return { server: o.u, pin: o.p };
+  } catch (e) {}
+  return null;
+}
+function appUrl() { return /^https?:$/.test(location.protocol) && location.host !== "workattend.app" ? location.origin + location.pathname : window.WEB_URL; }
+async function connect(server, pin) {
+  server = String(server || "").trim(); pin = String(pin || "").trim();
+  if (!/^https:\/\/script\.google(usercontent)?\.com\/.+\/exec(\?.*)?$/.test(server)) { toast(t("badUrl")); return false; }
+  try { await Sync.api({ action: "check" }, server, pin); }
+  catch (e) { toast(errText(e)); return false; }
+  const changed = server !== S.server;
+  S.server = server; S.pin = pin; S.setupDone = true;
+  if (changed) { META.since = 0; for (const tb of TABLES) for (const id of Object.keys(D[tb])) DIRTY[tb][id] = D[tb][id].updatedAt || Date.now(); }
+  META.err = ""; saveAll();
+  await Sync.run(); toast(t("connOk")); return true;
+}
+
+/* ================= import parsing ================= */
+const KEYS = {
+  name: ["name", "full name", "fullname", "employee", "employee name", "staff", "staff name", "الاسم", "اسم", "اسم الموظف", "الموظف", "الاسم الكامل"],
+  phone: ["phone", "mobile", "mobile number", "phone number", "tel", "telephone", "cell", "whatsapp", "number", "الهاتف", "رقم الهاتف", "الجوال", "رقم الجوال", "الموبايل", "رقم", "واتساب", "هاتف", "جوال"],
+  title: ["title", "job", "job title", "position", "role", "designation", "المسمى", "المسمى الوظيفي", "الوظيفة", "المهنة"],
+  dept: ["department", "dept", "section", "team", "division", "القسم", "الإدارة", "الادارة", "الفريق"],
+  first: ["first name", "firstname", "given name", "الاسم الأول"], last: ["last name", "lastname", "surname", "family name", "family", "اسم العائلة", "العائلة"],
+};
+function headerMap(row) {
+  const m = {}; let hits = 0;
+  row.forEach((cell, i) => {
+    const c = normName(cell);
+    for (const k of Object.keys(KEYS)) if (m[k] == null && KEYS[k].some(x => normName(x) === c)) { m[k] = i; hits++; break; }
+  });
+  return hits ? m : null;
+}
+function looksPhone(v) { const raw = String(v).replace(/[\s\-+().]/g, ""); const d = digits(v); return d.length >= 7 && d.length <= 15 && d.length >= raw.length * 0.8; }
+function tableToPeople(rows) {
+  rows = rows.map(r => (Array.isArray(r) ? r : [r]).map(c => c == null ? "" : String(c).trim())).filter(r => r.some(c => c));
+  if (!rows.length) return [];
+  let map = headerMap(rows[0]);
+  if (map) rows = rows.slice(1);
+  else {
+    map = {}; const cols = Math.max(...rows.map(r => r.length));
+    for (let i = 0; i < cols; i++) {
+      const vals = rows.map(r => r[i] || "").filter(Boolean);
+      if (!vals.length) continue;
+      if (vals.filter(looksPhone).length / vals.length > .6) { if (map.phone == null) map.phone = i; }
+      else if (map.name == null && vals.filter(v => /\p{L}/u.test(v)).length / vals.length > .6) map.name = i;
+    }
+  }
+  const out = [];
+  for (const r of rows) {
+    let name = map.name != null ? r[map.name] : "";
+    if (!name && (map.first != null || map.last != null)) name = [r[map.first], r[map.last]].filter(Boolean).join(" ");
+    name = String(name || "").replace(/\s+/g, " ").trim();
+    if (!name || !/\p{L}/u.test(name)) continue;
+    out.push({ name, phone: map.phone != null ? r[map.phone] || "" : "", title: map.title != null ? r[map.title] || "" : "", dept: map.dept != null ? r[map.dept] || "" : "" });
+  }
+  return out;
+}
+function parseDelimited(text) {
+  text = String(text || "").replace(/^﻿/, "");
+  const first = text.split(/\r?\n/).find(l => l.trim()) || "";
+  const best = ["\t", ";", ",", "|"].map(d => [d, first.split(d).length]).sort((a, b) => b[1] - a[1])[0];
+  const d = best[1] > 1 ? best[0] : null;
+  const rows = []; let row = [], cell = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) { if (ch === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += ch; continue; }
+    if (ch === '"' && cell === "") { q = true; continue; }
+    if (d && ch === d) { row.push(cell); cell = ""; continue; }
+    if (ch === "\n" || ch === "\r") { if (ch === "\r" && text[i + 1] === "\n") i++; row.push(cell); rows.push(row); row = []; cell = ""; continue; }
+    cell += ch;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return rows;
+}
+function decodeVcf(v, key) {
+  if (/QUOTED-PRINTABLE/i.test(key)) { try { v = decodeURIComponent(v.replace(/=\r?\n/g, "").replace(/=([0-9A-F]{2})/gi, "%$1")); } catch (e) {} }
+  return v.replace(/\\,/g, ",").replace(/\\;/g, ";").replace(/\\n/gi, " ").trim();
+}
+function parseVcf(text) {
+  const out = [];
+  for (const card of text.replace(/\r?\n[ \t]/g, "").split(/BEGIN:VCARD/i).slice(1)) {
+    let fn = "", n = "", tel = "", org = "", title = "";
+    for (const line of card.split(/\r?\n/)) {
+      const i = line.indexOf(":"); if (i < 0) continue;
+      const key = line.slice(0, i).toUpperCase(), val = decodeVcf(line.slice(i + 1), key), base = key.split(";")[0].replace(/^ITEM\d+\./, "");
+      if (base === "FN") fn = val;
+      else if (base === "N") n = val.split(";").slice(0, 2).reverse().filter(Boolean).join(" ");
+      else if (base === "TEL" && !tel) tel = val;
+      else if (base === "ORG") org = val.split(";")[0];
+      else if (base === "TITLE") title = val;
+    }
+    const name = (fn || n).trim();
+    if (name) out.push({ name, phone: tel, title, dept: org });
+  }
+  return out;
+}
+function parseJson(text) {
+  let j = JSON.parse(text);
+  if (j && j.data && j.data.employees) j = Object.values(j.data.employees).filter(e => !e.deletedAt);
+  if (!Array.isArray(j)) j = Object.values(j || {});
+  return j.map(x => typeof x === "string" ? { name: x } : { name: x.name || x.Name || x["الاسم"] || x.fullName || "", phone: x.phone || x.mobile || x.Phone || "", title: x.title || x.job || "", dept: x.dept || x.department || "" }).filter(x => String(x.name).trim());
+}
+function loadScript(src) { return new Promise((ok, no) => { if (window.XLSX) return ok(); const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
+async function readImportFile(file) {
+  const name = file.name.toLowerCase();
+  if (/\.(xlsx|xls|xlsm|ods)$/.test(name)) {
+    await loadScript("xlsx.full.min.js");
+    const wb = XLSX.read(new Uint8Array(await file.arrayBuffer()), { type: "array" });
+    for (const sn of wb.SheetNames) { const people = tableToPeople(XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, raw: false, defval: "" })); if (people.length) return people; }
+    return [];
+  }
+  const text = await file.text();
+  if (/\.vcf$/.test(name) || /BEGIN:VCARD/i.test(text)) return parseVcf(text);
+  if (/\.json$/.test(name)) return parseJson(text);
+  return tableToPeople(parseDelimited(text));
+}
+function openImportPreview(people) {
+  const ex = new Set(employees().map(e => normName(e.name))), exPh = new Set(employees().map(e => digits(e.phone)).filter(p => p.length >= 7));
+  const seen = new Set(), rows = [];
+  for (const p of people) {
+    const k = normName(p.name); if (seen.has(k)) continue; seen.add(k);
+    const dup = ex.has(k) || (digits(p.phone).length >= 7 && exPh.has(digits(p.phone)));
+    rows.push(Object.assign({}, p, { dup, on: !dup }));
+  }
+  if (!rows.length) { UI.overlay = null; toast(t("nothingFound")); return; }
+  UI.overlay = { kind: "impPreview", rows }; render();
+}
+
+/* ================= files out (backup / CSV) ================= */
+function saveFile(name, mime, text) {
+  if (window.AndroidBridge && AndroidBridge.saveFile) { AndroidBridge.saveFile(name, mime, text); return; }
+  const blob = new Blob([text], { type: mime }); const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast(t("exported"));
+}
+function csvCell(v) { v = String(v == null ? "" : v); return /[",\n;]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v; }
+function exportMonthCsv() {
+  const m = UI.month, name = id => (D.employees[id] && D.employees[id].name) || t("unknownEmp");
+  const rows = Object.values(D.attendance).filter(a => !a.deletedAt && a.status && a.date && a.date.startsWith(m)).sort((a, b) => a.date.localeCompare(b.date) || name(a.empId).localeCompare(name(b.empId), "ar"));
+  const lines = [["Date / التاريخ", "Employee / الموظف", "Department / القسم", "Status / الحالة"].join(",")];
+  for (const r of rows) { const e = D.employees[r.empId] || {}; lines.push([r.date, name(r.empId), e.dept || "", `${ST[r.status].ar} / ${ST[r.status].en}`].map(csvCell).join(",")); }
+  lines.push("", ["Employee / الموظف", ...STATUSES.map(s => `${ST[s].ar} / ${ST[s].en}`)].map(csvCell).join(","));
+  for (const id of [...new Set(rows.map(r => r.empId))]) lines.push([name(id), ...STATUSES.map(s => rows.filter(r => r.empId === id && r.status === s).length)].map(csvCell).join(","));
+  saveFile(`attendance-${m}.csv`, "text/csv", "﻿" + lines.join("\r\n"));
+}
+
+/* ================= WhatsApp ================= */
+function waNumber() { let n = digits(S.waNumber); if (!n) return ""; if (n.startsWith("00")) n = n.slice(2); else if (n.startsWith("0")) n = (digits(S.cc) || "971") + n.slice(1); return n; }
+function openWhatsApp(text) {
+  const num = S.dest === "number" ? waNumber() : "";
+  if (window.AndroidBridge && AndroidBridge.openWhatsApp) { AndroidBridge.openWhatsApp(text, num); return; }
+  window.location.href = `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); }
+  catch (e) { const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch (x) {} ta.remove(); }
+  toast(t("copied"));
+}
+
+/* ================= icons ================= */
+const I = {
+  today: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M8.5 15l2.5 2.5 4.5-5"/></svg>',
+  people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M16.5 14.6c2.6.1 4.5 1.8 5 4.6"/></svg>',
+  msg: '<svg viewBox="0 0 24 24"><path d="M20.5 11.6A8.5 8.5 0 0 1 8 19.1L3.5 20.5l1.4-4.3A8.5 8.5 0 1 1 20.5 11.6z"/><path d="M8.5 10.5h7M8.5 13.5h4.5"/></svg>',
+  reports: '<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+  settings: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>',
+  prev: '<svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>', next: '<svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>',
+  upload: '<svg viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>',
+  sync: '<svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-15.5 6.2M3 12A9 9 0 0 1 18.5 5.8"/><path d="M21 4v5h-5M3 20v-5h5"/></svg>',
+  wa: '<svg viewBox="0 0 24 24"><path d="M20.5 11.6A8.5 8.5 0 0 1 8 19.1L3.5 20.5l1.4-4.3A8.5 8.5 0 1 1 20.5 11.6z"/><path d="M9 8.5c0 3.5 2.5 6.5 6.5 6.5"/></svg>',
+  close: '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+};
+
+/* ================= rendering ================= */
+function render() {
+  const app = $("#app"), l = lang();
+  document.documentElement.lang = l; document.documentElement.dir = l === "ar" ? "rtl" : "ltr";
+  const toastHtml = UI.toast ? `<div class="toast" role="status">${esc(UI.toast)}</div>` : "";
+  if (!S.setupDone) { app.innerHTML = viewSetup() + (UI.overlay ? viewOverlay() : "") + toastHtml; return bindAfter(); }
+  const tabs = ["today", "people", "msg", "reports", "settings"];
+  const screen = { today: viewToday, people: viewPeople, msg: viewMsg, reports: viewReports, settings: viewSettings }[UI.tab]();
+  app.innerHTML = screen + `<nav class="nav">${tabs.map(tb => `<button data-act="tab" data-v="${tb}" class="${UI.tab === tb ? "on" : ""}" aria-current="${UI.tab === tb ? "page" : "false"}">${I[tb]}<span>${t(tb)}</span></button>`).join("")}</nav>` + (UI.overlay ? viewOverlay() : "") + toastHtml;
+  bindAfter();
+}
+function bar(title, sub, extra = "") {
+  return `<header class="bar"><div class="title-wrap"><h1>${esc(title)}</h1>${sub ? `<div class="sub">${esc(sub)}</div>` : ""}</div>${extra}${Sync.enabled() ? `<button class="icon-btn" data-act="syncNow" aria-label="${t("syncNow")}" title="${t("syncNow")}"><span id="syncDot" class="sync-dot ${syncClass()}"></span></button>` : ""}</header>`;
+}
+
+function viewSetup() {
+  return `<header class="bar"><div class="title-wrap"><h1>${t("welcome")}</h1></div>
+    <div class="seg" style="width:120px"><button data-act="lang" data-v="ar" class="${lang() === "ar" ? "on" : ""}">ع</button><button data-act="lang" data-v="en" class="${lang() === "en" ? "on" : ""}">EN</button></div></header>
+  <div class="scroll">
+    <div class="hero"><div class="big">${t("appName")}</div><div class="meta">${t("welcomeHint")}</div></div>
+    <div class="card">
+      <div class="field"><label for="sUrl">${t("serverUrl")}</label><input class="input ltr" id="sUrl" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(UI.form ? UI.form.url : S.server)}" autocomplete="off"></div>
+      <div class="field"><label for="sPin">${t("pin")}</label><input class="input" id="sPin" value="${esc(UI.form ? UI.form.pin : S.pin)}" autocomplete="off"></div>
+      <button class="btn primary" data-act="connect">${t("connect")}</button>
+      <div class="field"><label for="sCode">${t("orPaste")}</label><textarea class="input ltr" id="sCode" style="min-height:64px" placeholder="${t("setupCode")}"></textarea></div>
+      <button class="btn tonal" data-act="applyCode">${t("pasteSetup")}</button>
+    </div>
+    <button class="btn ghost" data-act="useLocal">${t("useLocal")}</button>
+  </div>`;
+}
+
+function viewToday() {
+  const emps = employees(), d = UI.date, { c } = dayCounts(d);
+  const q = normName(UI.q), list = q ? emps.filter(e => normName([e.name, e.dept, e.title].join(" ")).includes(q)) : emps;
+  const head = bar(t("today"), "");
+  if (!emps.length) return head + `<div class="scroll"><div class="empty"><div style="font-size:42px">👥</div><div>${t("noEmp")}</div>
+    <button class="btn primary" data-act="addEmp">${t("addEmp")}</button><button class="btn tonal" data-act="openImport">${I.upload}${t("importList")}</button></div></div>`;
+  return head + `<div class="scroll">
+    <div class="hero">
+      <div class="datebar">
+        <button class="icon-btn flip" style="color:#fff" data-act="day" data-v="-1" aria-label="${t("prev")}">${I.prev}</button>
+        <div style="flex:1;text-align:center"><div class="big" style="font-size:19px">${fmtDate(d)}</div>
+          <input type="date" id="dateIn" value="${d}" aria-label="${t("today")}" style="margin-top:4px;background:rgba(255,255,255,.14);border:0;border-radius:10px;color:#fff;padding:4px 8px;color-scheme:dark"></div>
+        <button class="icon-btn flip" style="color:#fff" data-act="day" data-v="1" aria-label="${t("next")}">${I.next}</button>
+      </div>
+      <div class="chips">${STATUSES.map(s => `<span class="chip"><span class="sw c-${s}"></span>${stLabel(s)} <b>${c[s]}</b></span>`).join("")}${c.none ? `<span class="chip"><span class="sw c-none"></span>${t("notMarked")} <b>${c.none}</b></span>` : ""}</div>
+      ${d === ymd(new Date()) ? "" : `<button class="btn sm" style="background:rgba(255,255,255,.16);color:#fff;align-self:center" data-act="goToday">${t("todayBtn")}</button>`}
+    </div>
+    <div class="row"><input class="input" id="qIn" placeholder="${t("search")}" value="${esc(UI.q)}" style="flex:1">
+      ${c.none ? `<button class="btn sm tonal" data-act="restPresent">${I.check}${t("restPresent")}</button>` : ""}</div>
+    <div class="tiny">${t("marked", emps.length - c.none, emps.length)}</div>
+    <div class="list">${list.map(e => { const s = attOf(d, e.id); return `<div class="att">
+      <div class="n"><span class="sw c-${s || "none"}"></span><span>${esc(e.name)}</span><span class="s">${esc([e.title, e.dept].filter(Boolean).join(" · "))}</span></div>
+      <div class="st5" role="group" aria-label="${esc(e.name)}">${STATUSES.map(x => `<button data-act="mark" data-id="${esc(e.id)}" data-v="${x}" class="${x} ${s === x ? "on" : ""}" aria-pressed="${s === x}">${stLabel(x)}</button>`).join("")}</div></div>`; }).join("")}</div>
+    <button class="btn wa" data-act="toMsgSummary">${I.wa}${t("sendSummary")}</button>
+  </div>`;
+}
+
+function viewPeople() {
+  const emps = employees(), q = normName(UI.pq), qd = digits(UI.pq);
+  const list = q ? emps.filter(e => normName([e.name, e.phone, e.title, e.dept].join(" ")).includes(q) || (qd && digits(e.phone).includes(qd))) : emps;
+  return bar(t("people"), t("empCount", emps.length), `<button class="icon-btn" data-act="openImport" aria-label="${t("importList")}" title="${t("importList")}">${I.upload}</button>`) + `<div class="scroll">
+    ${emps.length ? `<input class="input" id="pqIn" placeholder="${t("search")}" value="${esc(UI.pq)}">
+      <div class="list">${list.map(e => `<button class="item" data-act="empDetail" data-id="${esc(e.id)}">
+      <span class="avatar">${esc((e.name || "?").trim().charAt(0))}</span>
+      <span class="body"><div class="t">${esc(e.name)}</div><div class="s">${esc([e.title, e.dept].filter(Boolean).join(" · "))}${e.phone ? ` <span class="ltr">${esc(e.phone)}</span>` : ""}</div></span></button>`).join("")}</div>`
+      : `<div class="empty"><div style="font-size:42px">👥</div><div>${t("noEmp")}</div></div>`}
+    <button class="btn tonal" data-act="openImport">${I.upload}${t("importList")}</button>
+  </div><button class="fab" data-act="addEmp" aria-label="${t("addEmp")}">+</button>`;
+}
+
+function viewMsg() {
+  const m = UI.msg, txt = hybridText(), sent = Object.values(D.messages).filter(x => !x.deletedAt).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 15);
+  const dest = S.dest === "number" && waNumber() ? t("toNumber", "+" + waNumber()) : t("toGroup");
+  return bar(t("msg"), "") + `<div class="scroll">
+    <div class="card">
+      <div class="field"><label for="srcIn">${t("writeMsg")}</label><textarea class="input" id="srcIn" dir="auto" placeholder="${t("msgPh")}">${esc(m.src)}</textarea></div>
+      <button class="btn primary" data-act="translate" ${m.busy ? "disabled" : ""}>${m.busy ? t("translating") : "🌐 " + t("makeBoth")}</button>
+      ${m.note ? `<div class="notice">${esc(m.note)}</div>` : ""}
+      ${(m.ar || m.en) ? `<div class="field"><label for="arIn">${t("arText")}</label><textarea class="input" id="arIn" dir="rtl" style="min-height:80px">${esc(m.ar)}</textarea></div>
+      <div class="field"><label for="enIn">${t("enText")}</label><textarea class="input" id="enIn" dir="ltr" style="min-height:80px">${esc(m.en)}</textarea></div>` : ""}
+      <button class="toggle" data-act="toggleSummary" aria-pressed="${!!m.summary}"><span><b>${t("addSummary")}</b><div class="tiny">${t("summaryOf", fmtDate(UI.date))}</div></span><span class="switch ${m.summary ? "on" : ""}"></span></button>
+    </div>
+    ${txt ? `<div class="field"><label>${t("preview")}</label><div class="wa-prev"><div class="bubble">${esc(txt)}</div></div></div>` : ""}
+    <div class="row"><span class="tiny" style="flex:1">${t("sendTo")}: <b>${esc(dest)}</b></span><button class="btn sm ghost" data-act="tab" data-v="settings">${t("change")}</button></div>
+    <button class="btn wa" data-act="sendWa">${I.wa}${t("openWa")}</button>
+    <button class="btn ghost" data-act="copyMsg">${t("copy")}</button>
+    <h2 style="margin-top:6px">${t("sentLog")}</h2>
+    ${sent.length ? `<div class="list">${sent.map(x => `<div class="item"><span class="body"><div class="t" style="font-size:14px;white-space:normal">${esc(String(x.text || "").split("\n").filter(Boolean)[0] || "")}</div>
+      <div class="s">${x.createdAt ? new Date(x.createdAt).toLocaleString() : esc(x.date)}</div></span>
+      <button class="btn sm ghost" data-act="reuseMsg" data-id="${esc(x.id)}">${t("reuse")}</button></div>`).join("")}</div>` : `<div class="tiny">${t("noSent")}</div>`}
+  </div>`;
+}
+
+function monthData(m) {
+  const rows = Object.values(D.attendance).filter(a => !a.deletedAt && a.status && a.date && a.date.startsWith(m));
+  const z = () => ({ present: 0, absent: 0, sick: 0, leave: 0, annual: 0 });
+  const byEmp = {}, byDay = {}, tot = z();
+  for (const r of rows) { tot[r.status]++; (byEmp[r.empId] = byEmp[r.empId] || z())[r.status]++; (byDay[r.date] = byDay[r.date] || z())[r.status]++; }
+  return { rows, byEmp, byDay, tot };
+}
+function viewReports() {
+  const m = UI.month, { rows, byEmp, byDay, tot } = monthData(m);
+  const nm = id => (D.employees[id] || {}).name || t("unknownEmp");
+  const empIds = Object.keys(byEmp).sort((a, b) => nm(a).localeCompare(nm(b), "ar"));
+  const days = Object.keys(byDay).sort().reverse();
+  return bar(t("reports"), "") + `<div class="scroll">
+    <div class="datebar card" style="flex-direction:row;padding:8px">
+      <button class="icon-btn flip" data-act="month" data-v="-1" aria-label="${t("prev")}">${I.prev}</button>
+      <div style="flex:1;text-align:center;font-weight:800;font-size:16px">${fmtMonth(m)}</div>
+      <button class="icon-btn flip" data-act="month" data-v="1" aria-label="${t("next")}">${I.next}</button></div>
+    <div class="grid5">${STATUSES.map(s => `<div class="stat"><b style="color:var(--s-${s})">${tot[s]}</b><span>${stLabel(s)}</span></div>`).join("")}</div>
+    ${rows.length ? `<h2>${t("perEmp")}</h2><div class="card" style="padding:6px 10px;overflow-x:auto"><table class="rep"><thead><tr><th>${t("name")}</th>${STATUSES.map(s => `<th title="${stLabel(s)}"><span class="sw c-${s}"></span><div class="tiny">${stLabel(s)}</div></th>`).join("")}</tr></thead>
+      <tbody>${empIds.map(id => `<tr class="click" data-act="empDetail" data-id="${esc(id)}"><td>${esc(nm(id))}</td>${STATUSES.map(s => `<td>${byEmp[id][s] || ""}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
+      <h2>${t("days")}</h2><div class="list">${days.map(d => `<button class="item" data-act="openDay" data-v="${d}"><span class="body"><div class="t">${fmtDate(d)}</div>
+        <div class="chips" style="margin-top:4px">${STATUSES.filter(s => byDay[d][s]).map(s => `<span class="chip"><span class="sw c-${s}"></span>${stLabel(s)} <b>${byDay[d][s]}</b></span>`).join("")}</div></span></button>`).join("")}</div>
+      <button class="btn tonal" data-act="exportCsv">${t("exportCsv")}</button>` : `<div class="empty">${t("noData")}</div>`}
+  </div>`;
+}
+
+function viewSettings() {
+  const conn = Sync.enabled();
+  const errMsg = META.err === "BAD_PIN" ? t("badPin") : META.err === "OFFLINE" ? t("offline") : META.err;
+  const status = conn ? (META.err ? `<div class="notice bad">${t("syncErrS")}: ${esc(errMsg)}</div>` : `<div class="notice good">${t("connected")} · ${t("lastSync", ago(META.lastSync))}</div>`) : `<div class="notice">${t("notConnected")}</div>`;
+  return bar(t("settings"), "") + `<div class="scroll">
+    <div class="card"><h2>${t("shared")}</h2>${status}
+      <div class="field"><label for="sUrl">${t("serverUrl")}</label><input class="input ltr" id="sUrl" value="${esc(UI.form ? UI.form.url : S.server)}" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"></div>
+      <div class="field"><label for="sPin">${t("pin")}</label><input class="input" id="sPin" value="${esc(UI.form ? UI.form.pin : S.pin)}" autocomplete="off"></div>
+      <div class="row"><button class="btn primary" data-act="connect">${t("connect")}</button>${conn ? `<button class="btn tonal" data-act="syncNow">${I.sync}${t("syncNow")}</button>` : ""}</div>
+      ${conn ? `<button class="btn tonal" data-act="shareSetup">${t("shareSetup")}</button>` : ""}
+      <button class="btn ghost" data-act="pasteSetupSheet">${t("pasteSetup")}</button>
+      ${conn ? `<button class="btn ghost" data-act="disconnect">${t("disconnect")}</button>` : ""}
+    </div>
+    <div class="card"><h2>${t("waDest")}</h2>
+      <div class="seg"><button data-act="dest" data-v="group" class="${S.dest !== "number" ? "on" : ""}">${t("destGroup")}</button><button data-act="dest" data-v="number" class="${S.dest === "number" ? "on" : ""}">${t("destNumber")}</button></div>
+      ${S.dest === "number" ? `<div class="row"><div class="field" style="width:90px"><label for="ccIn">${t("cc")}</label><input class="input ltr" id="ccIn" inputmode="numeric" value="${esc(S.cc)}"></div>
+        <div class="field" style="flex:1"><label for="numIn">${t("number")}</label><input class="input ltr" id="numIn" inputmode="tel" value="${esc(S.waNumber)}" placeholder="05x xxx xxxx"></div></div><div class="tiny">${t("numHint")}</div>` : `<div class="tiny">${t("groupHint")}</div>`}
+      <button class="toggle" data-act="defSummary" aria-pressed="${!!S.defSummary}"><b>${t("defSummary")}</b><span class="switch ${S.defSummary ? "on" : ""}"></span></button>
+    </div>
+    <div class="card"><h2>${t("language")}</h2>
+      <div class="seg">${["auto", "ar", "en"].map(v => `<button data-act="lang" data-v="${v}" class="${S.lang === v ? "on" : ""}">${v === "auto" ? t("auto") : v === "ar" ? "العربية" : "English"}</button>`).join("")}</div></div>
+    <div class="card"><h2>${t("backup")}</h2>
+      <button class="btn tonal" data-act="backup">${t("saveBackup")}</button>
+      <button class="btn ghost" data-act="restore">${t("restoreBackup")}</button></div>
+    <div class="card"><h2>${t("handover")}</h2><div class="muted" style="white-space:pre-line">${t("handoverText")}</div><div class="tiny">${t("about")}</div></div>
+    <button class="btn danger" data-act="erase">${t("erase")}</button>
+    <div class="tiny" style="text-align:center">WorkAttend v1.0</div>
+  </div>`;
+}
+
+function viewOverlay() {
+  const o = UI.overlay;
+  if (o.kind === "empEdit") {
+    const e = o.emp || {};
+    return `<div class="overlay" data-act="closeOv"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>
+      <h3>${o.emp ? t("editEmp") : t("addEmp")}</h3>
+      <div class="field"><label for="fName">${t("name")} *</label><input class="input" id="fName" dir="auto" value="${esc(e.name)}"></div>
+      <div class="field"><label for="fPhone">${t("phone")}</label><input class="input ltr" id="fPhone" inputmode="tel" value="${esc(e.phone)}"></div>
+      <div class="row"><div class="field" style="flex:1"><label for="fTitle">${t("title")}</label><input class="input" id="fTitle" dir="auto" value="${esc(e.title)}"></div>
+        <div class="field" style="flex:1"><label for="fDept">${t("dept")}</label><input class="input" id="fDept" dir="auto" value="${esc(e.dept)}"></div></div>
+      <div class="field"><label for="fNotes">${t("notes")}</label><input class="input" id="fNotes" dir="auto" value="${esc(e.notes)}"></div>
+      <div class="row"><button class="btn ghost" data-act="closeOv">${t("cancel")}</button><button class="btn primary" data-act="saveEmp">${t("save")}</button></div>
+    </div></div>`;
+  }
+  if (o.kind === "empDetail") {
+    const e = D.employees[o.id]; if (!e) { UI.overlay = null; return ""; }
+    const m = ymd(new Date()).slice(0, 7);
+    const recs = Object.values(D.attendance).filter(a => a.empId === e.id && !a.deletedAt && a.status).sort((a, b) => b.date.localeCompare(a.date));
+    const mc = {}; STATUSES.forEach(s => mc[s] = recs.filter(r => r.date.startsWith(m) && r.status === s).length);
+    return `<div class="overlay" data-act="closeOv"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>
+      <div class="row"><span class="avatar">${esc((e.name || "?").charAt(0))}</span><div style="flex:1;min-width:0"><h3>${esc(e.name)}</h3><div class="tiny">${esc([e.title, e.dept].filter(Boolean).join(" · "))} ${e.phone ? `<span class="ltr">${esc(e.phone)}</span>` : ""}</div></div>
+        <button class="icon-btn" data-act="closeOv" aria-label="${t("cancel")}">${I.close}</button></div>
+      ${e.deletedAt ? `<div class="notice bad">${t("deleted")}</div>` : ""}
+      <div class="tiny"><b>${t("thisMonth")}</b></div>
+      <div class="grid5">${STATUSES.map(s => `<div class="stat"><b style="color:var(--s-${s})">${mc[s]}</b><span>${stLabel(s)}</span></div>`).join("")}</div>
+      <div class="tiny"><b>${t("recent")}</b></div>
+      ${recs.length ? `<div class="list">${recs.slice(0, 12).map(r => `<div class="item" style="padding:8px 12px"><span class="sw c-${r.status}"></span><span class="body">${fmtDate(r.date)}</span><b>${stLabel(r.status)}</b></div>`).join("")}</div>` : `<div class="tiny">${t("noRecords")}</div>`}
+      ${e.deletedAt ? "" : `<div class="row"><button class="btn danger" data-act="delEmp" data-id="${esc(e.id)}">${t("del")}</button><button class="btn tonal" data-act="editEmp" data-id="${esc(e.id)}">${t("edit")}</button></div>`}
+    </div></div>`;
+  }
+  if (o.kind === "import") {
+    return `<div class="overlay" data-act="closeOv"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>
+      <h3>${t("impTitle")}</h3><div class="muted">${t("impHint")}</div>
+      <div class="chips"><span class="chip">Excel .xlsx .xls</span><span class="chip">CSV</span><span class="chip">vCard .vcf</span><span class="chip">TXT</span><span class="chip">JSON</span></div>
+      <button class="btn primary" data-act="pickFile">${I.upload}${t("chooseFile")}</button>
+      <div class="field"><label for="pasteIn">${t("pasteList")}</label><textarea class="input" id="pasteIn" dir="auto" placeholder="${t("pasteHint")}"></textarea></div>
+      <button class="btn tonal" data-act="readPaste">${t("readList")}</button>
+    </div></div>`;
+  }
+  if (o.kind === "impPreview") {
+    const n = o.rows.filter(r => r.on).length;
+    return `<div class="overlay"><div class="sheet full" role="dialog" aria-modal="true">
+      <div class="row"><h3 style="flex:1">${t("found", o.rows.length)}</h3><button class="icon-btn" data-act="closeOv" aria-label="${t("cancel")}">${I.close}</button></div>
+      <div class="row"><button class="btn sm ghost" data-act="impAll" data-v="1">${t("selAll")}</button><button class="btn sm ghost" data-act="impAll" data-v="0">${t("selNone")}</button></div>
+      <div style="flex:1;overflow-y:auto">${o.rows.map((r, i) => `<label class="imp-row"><input type="checkbox" data-imp="${i}" ${r.on ? "checked" : ""}>
+        <span class="body"><b>${esc(r.name)}</b> ${r.dup ? `<span class="tag">${t("exists")}</span>` : ""}<div class="tiny">${esc([r.phone, r.title, r.dept].filter(Boolean).join(" · "))}</div></span></label>`).join("")}</div>
+      <button class="btn primary" data-act="doImport" ${n ? "" : "disabled"}>${t("importN", n)}</button>
+    </div></div>`;
+  }
+  if (o.kind === "confirm") {
+    return `<div class="overlay" data-act="closeOv"><div class="sheet" role="alertdialog" aria-modal="true"><div class="grab"></div>
+      <h3>${esc(o.text)}</h3><div class="row"><button class="btn ghost" data-act="closeOv">${esc(o.no || t("cancel"))}</button><button class="btn ${o.danger ? "danger" : "primary"}" data-act="confirmYes">${esc(o.yes)}</button></div></div></div>`;
+  }
+  if (o.kind === "pasteSetup") {
+    return `<div class="overlay" data-act="closeOv"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>
+      <h3>${t("pasteSetup")}</h3><textarea class="input ltr" id="codeIn" placeholder="${t("setupCode")}"></textarea>
+      <div class="row"><button class="btn ghost" data-act="closeOv">${t("cancel")}</button><button class="btn primary" data-act="applyCode2">${t("connect")}</button></div></div></div>`;
+  }
+  return "";
+}
+
+/* ================= interactions ================= */
+function toast(msg) { UI.toast = msg; render(); clearTimeout(toast.tm); toast.tm = setTimeout(() => { UI.toast = null; render(); }, 2600); }
+function confirmBox(text, yes, fn, danger, no) { UI.overlay = { kind: "confirm", text, yes, fn, danger, no }; render(); }
+function keepFocus(id, fn) { const el = document.getElementById(id); const pos = el ? el.selectionStart : null; fn(); const n = document.getElementById(id); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) {} } }
+function refreshPreview() { const b = $(".wa-prev .bubble"); if (b) b.textContent = hybridText(); }
+
+function bindAfter() {
+  const q = $("#qIn"); if (q) q.oninput = () => keepFocus("qIn", () => { UI.q = q.value; render(); });
+  const pq = $("#pqIn"); if (pq) pq.oninput = () => keepFocus("pqIn", () => { UI.pq = pq.value; render(); });
+  const di = $("#dateIn"); if (di) di.onchange = () => { if (di.value) { UI.date = di.value; render(); } };
+  const src = $("#srcIn"); if (src) src.oninput = () => { UI.msg.src = src.value; };
+  const ar = $("#arIn"); if (ar) ar.oninput = () => { UI.msg.ar = ar.value; refreshPreview(); };
+  const en = $("#enIn"); if (en) en.oninput = () => { UI.msg.en = en.value; refreshPreview(); };
+  const num = $("#numIn"); if (num) num.onchange = () => { S.waNumber = num.value.trim(); saveAll(); };
+  const cc = $("#ccIn"); if (cc) cc.onchange = () => { S.cc = digits(cc.value) || "971"; saveAll(); };
+  document.querySelectorAll("[data-imp]").forEach(cb => cb.onchange = () => {
+    UI.overlay.rows[+cb.dataset.imp].on = cb.checked;
+    const b = $('[data-act="doImport"]'), n = UI.overlay.rows.filter(r => r.on).length;
+    if (b) { b.textContent = t("importN", n); b.disabled = !n; }
+  });
+}
+function resetMsg() { UI.msg = { src: "", ar: "", en: "", summary: S.defSummary, busy: false, note: "" }; }
+
+document.addEventListener("click", async ev => {
+  const el = ev.target.closest("[data-act]"); if (!el) return;
+  const act = el.dataset.act, v = el.dataset.v, id = el.dataset.id;
+  if (act === "closeOv") { if (el.classList.contains("overlay") && ev.target !== el) return; UI.overlay = null; return render(); }
+  switch (act) {
+    case "tab": UI.tab = v; UI.overlay = null; render(); { const sc = $(".scroll"); if (sc) sc.scrollTop = 0; } break;
+    case "day": UI.date = addDays(UI.date, +v); render(); break;
+    case "goToday": UI.date = ymd(new Date()); render(); break;
+    case "openDay": UI.date = v; UI.tab = "today"; render(); break;
+    case "month": { const [y, m] = UI.month.split("-").map(Number); UI.month = ymd(new Date(y, m - 1 + (+v), 1)).slice(0, 7); render(); break; }
+    case "mark": { const e = D.employees[id]; if (!e) return; setAtt(UI.date, e, attOf(UI.date, id) === v ? null : v); render(); break; }
+    case "restPresent": for (const e of employees()) if (!attOf(UI.date, e.id)) setAtt(UI.date, e, "present"); render(); break;
+    case "toMsgSummary": UI.msg.summary = true; UI.tab = "msg"; render(); break;
+    case "addEmp": UI.overlay = { kind: "empEdit" }; render(); setTimeout(() => { const f = $("#fName"); if (f) f.focus(); }, 50); break;
+    case "editEmp": UI.overlay = { kind: "empEdit", emp: D.employees[id] }; render(); break;
+    case "empDetail": UI.overlay = { kind: "empDetail", id }; render(); break;
+    case "saveEmp": {
+      const name = $("#fName").value.replace(/\s+/g, " ").trim(); if (!name) { toast(t("nameReq")); return; }
+      const row = Object.assign({}, UI.overlay.emp || { id: uid("e"), createdAt: Date.now() }, { name, phone: $("#fPhone").value.trim(), title: $("#fTitle").value.trim(), dept: $("#fDept").value.trim(), notes: $("#fNotes").value.trim(), deletedAt: null });
+      put("employees", row); UI.overlay = null; toast(t("saved")); break; }
+    case "delEmp": { const e = D.employees[id]; confirmBox(t("confirmDel", e.name), t("del"), () => { put("employees", Object.assign({}, e, { deletedAt: Date.now() })); toast(t("deleted")); }, true); break; }
+    case "openImport": UI.overlay = { kind: "import" }; render(); break;
+    case "pickFile": $("#fileImport").value = ""; $("#fileImport").click(); break;
+    case "readPaste": openImportPreview(tableToPeople(parseDelimited($("#pasteIn").value))); break;
+    case "impAll": UI.overlay.rows.forEach(r => r.on = v === "1"); render(); break;
+    case "doImport": {
+      const rows = UI.overlay.rows.filter(r => r.on), now = Date.now();
+      rows.forEach((r, i) => { const row = { id: uid("e"), name: r.name, phone: r.phone || "", title: r.title || "", dept: r.dept || "", notes: "", createdAt: now + i, deletedAt: null, updatedAt: now + i }; D.employees[row.id] = row; DIRTY.employees[row.id] = row.updatedAt; });
+      saveAll(); Sync.soon(); UI.overlay = null; UI.tab = "people"; toast(t("imported", rows.length)); break; }
+    case "translate": {
+      const src = ($("#srcIn") || {}).value || UI.msg.src; UI.msg.src = src; UI.msg.note = "";
+      if (!src.trim()) { toast(t("emptyMsg")); return; }
+      const ar = isArabicText(src);
+      const fallback = note => { if (ar) UI.msg.ar = src; else UI.msg.en = src; UI.msg.note = note; };
+      if (!Sync.enabled()) { fallback(t("needServer")); return render(); }
+      UI.msg.busy = true; render();
+      try { const r = await Sync.api({ action: "translate", text: src }); UI.msg.ar = r.ar; UI.msg.en = r.en; }
+      catch (e) { fallback(e.code === "OFFLINE" ? t("offline") : t("trErr")); }
+      UI.msg.busy = false; render(); break; }
+    case "toggleSummary": UI.msg.summary = !UI.msg.summary; render(); break;
+    case "sendWa": case "copyMsg": {
+      if (!UI.msg.ar && !UI.msg.en && UI.msg.src.trim()) { if (isArabicText(UI.msg.src)) UI.msg.ar = UI.msg.src; else UI.msg.en = UI.msg.src; }
+      const txt = hybridText(); if (!txt) { toast(t("emptyMsg")); return; }
+      if (act === "copyMsg") return copyText(txt);
+      const date = UI.date;
+      openWhatsApp(txt);
+      setTimeout(() => confirmBox(t("didSend"), t("yesSent"), () => { put("messages", { id: uid("m"), date, text: txt, createdAt: Date.now(), deletedAt: null }); resetMsg(); render(); }, false, t("notYet")), 700);
+      break; }
+    case "reuseMsg": { const m = D.messages[id]; if (m) copyText(m.text); break; }
+    case "exportCsv": exportMonthCsv(); break;
+    case "syncNow": if (Sync.enabled()) { toast(t("syncing")); await Sync.run(true); } break;
+    case "connect": { UI.form = { url: $("#sUrl").value, pin: $("#sPin").value }; if (await connect(UI.form.url, UI.form.pin)) { UI.form = null; render(); } break; }
+    case "useLocal": S.setupDone = true; saveAll(); render(); break;
+    case "applyCode": case "applyCode2": {
+      const c = readSetupCode(($(act === "applyCode" ? "#sCode" : "#codeIn") || {}).value || ""); if (!c) { toast(t("badCode")); return; }
+      UI.overlay = null; if (await connect(c.server, c.pin)) { toast(t("setupApplied")); } break; }
+    case "pasteSetupSheet": UI.overlay = { kind: "pasteSetup" }; render(); break;
+    case "shareSetup": {
+      const code = setupCode(), link = appUrl() + "#setup=" + code, text = t("setupShareText", link, code);
+      if (window.AndroidBridge && AndroidBridge.shareText) AndroidBridge.shareText(text);
+      else if (navigator.share) { try { await navigator.share({ text }); } catch (e) {} } else copyText(text);
+      break; }
+    case "disconnect": confirmBox(t("disconnect") + "?", t("disconnect"), () => { S.server = ""; S.pin = ""; META.since = 0; META.err = ""; saveAll(); render(); }, true); break;
+    case "dest": S.dest = v; saveAll(); render(); break;
+    case "defSummary": S.defSummary = !S.defSummary; UI.msg.summary = S.defSummary; saveAll(); render(); break;
+    case "lang": S.lang = v; saveAll(); render(); break;
+    case "backup": saveFile(`workattend-backup-${ymd(new Date())}.json`, "application/json", JSON.stringify({ app: "workattend", version: 1, exportedAt: Date.now(), data: D }, null, 1)); break;
+    case "restore": $("#fileRestore").value = ""; $("#fileRestore").click(); break;
+    case "erase": confirmBox(t("eraseConfirm"), t("erase"), () => { ["wa.data", "wa.dirty", "wa.meta"].forEach(k => localStorage.removeItem(k)); location.reload(); }, true); break;
+    case "confirmYes": { const fn = UI.overlay.fn; UI.overlay = null; render(); if (fn) fn(); break; }
+  }
+});
+
+async function handleImportFile(f) { try { openImportPreview(await readImportFile(f)); } catch (err) { console.error(err); UI.overlay = null; toast(t("fileErr")); } }
+async function handleRestoreFile(f) {
+  try {
+    const j = JSON.parse(await f.text()), data = j.data || j;
+    confirmBox(t("restoreConfirm"), t("restoreBackup"), () => {
+      for (const tb of TABLES) for (const row of Object.values(data[tb] || {})) {
+        const loc = D[tb][row.id]; if (row && row.id && (!loc || (row.updatedAt || 0) > (loc.updatedAt || 0))) { D[tb][row.id] = row; DIRTY[tb][row.id] = row.updatedAt || Date.now(); }
+      }
+      saveAll(); Sync.soon(); toast(t("restored"));
+    });
+  } catch (err) { toast(t("fileErr")); }
+}
+$("#fileImport").addEventListener("change", e => { const f = e.target.files && e.target.files[0]; if (f) handleImportFile(f); });
+/* Android app hooks: a file opened/shared with the app, and the system Back button */
+window.onNativeFile = (name, base64) => { try { const bin = Uint8Array.from(atob(base64), c => c.charCodeAt(0)); UI.tab = "people"; handleImportFile(new File([bin], name)); } catch (e) { toast(t("fileErr")); } };
+window.onNativeSaved = ok => toast(ok ? t("exported") : t("fileErr"));
+window.onAndroidBack = () => { if (UI.overlay) { UI.overlay = null; render(); return true; } if (S.setupDone && UI.tab !== "today") { UI.tab = "today"; render(); return true; } return false; };
+$("#fileRestore").addEventListener("change", e => { const f = e.target.files && e.target.files[0]; if (f) handleRestoreFile(f); });
+
+/* ================= boot ================= */
+(async function boot() {
+  const hash = location.hash || "";
+  if (hash.startsWith("#setup=")) {
+    const c = readSetupCode(hash); history.replaceState(null, "", location.pathname + location.search);
+    render();
+    if (c && await connect(c.server, c.pin)) toast(t("setupApplied"));
+  }
+  render();
+  if (Sync.enabled()) Sync.run();
+  setInterval(() => { if (document.visibilityState === "visible") Sync.run(); }, 60000);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") Sync.run(); });
+  window.addEventListener("online", () => Sync.run());
+})();
+</script>
+</body>
+</html>
