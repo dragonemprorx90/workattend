@@ -137,6 +137,8 @@ table.rep tr.click{cursor:pointer} table.rep tr.click:hover{background:var(--sur
 /* Public address of the web version (used for setup links shared from the Android app).
    If the repo moves to a new owner, update this one line. */
 window.WEB_URL = window.WEB_URL || "https://dragonemprorx90.github.io/workattend/";
+/* Default shared database (Google Apps Script). A new owner can paste their own link in Settings. */
+window.DEFAULT_SERVER = window.DEFAULT_SERVER || "https://script.google.com/macros/s/AKfycby0Z9ezm-yLdMvlwc0RRTcEJ_HVbBcpxyXphD5r9nvgm3DIspVUBHy_5SG2CTVqhBbzoQ/exec";
 
 /* ================= constants & i18n ================= */
 const STATUSES = ["present","absent","sick","leave","annual"];
@@ -234,8 +236,9 @@ function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch
 function load(k, def) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? def : v; } catch (e) { return def; } }
 
 /* ================= state ================= */
-const DEF_SETTINGS = { lang: "auto", server: "", pin: "", setupDone: false, dest: "group", waNumber: "", cc: "971", defSummary: false };
+const DEF_SETTINGS = { lang: "auto", server: window.DEFAULT_SERVER || "", pin: "", setupDone: false, dest: "group", waNumber: "", cc: "971", defSummary: false };
 const S = Object.assign({}, DEF_SETTINGS, load("wa.settings", {}));
+if (!S.server && window.DEFAULT_SERVER) S.server = window.DEFAULT_SERVER;
 const D = Object.assign({ employees: {}, attendance: {}, messages: {} }, load("wa.data", {}));
 const DIRTY = Object.assign({ employees: {}, attendance: {}, messages: {} }, load("wa.dirty", {}));
 const META = Object.assign({ since: 0, lastSync: 0, err: "" }, load("wa.meta", {}));
@@ -676,7 +679,7 @@ function viewSettings() {
       <button class="btn ghost" data-act="restore">${t("restoreBackup")}</button></div>
     <div class="card"><h2>${t("handover")}</h2><div class="muted" style="white-space:pre-line">${t("handoverText")}</div><div class="tiny">${t("about")}</div></div>
     <button class="btn danger" data-act="erase">${t("erase")}</button>
-    <div class="tiny" style="text-align:center">WorkAttend v1.0</div>
+    <div class="tiny" style="text-align:center">WorkAttend v1.1</div>
   </div>`;
 }
 
