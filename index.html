@@ -679,7 +679,7 @@ function viewSettings() {
       <button class="btn ghost" data-act="restore">${t("restoreBackup")}</button></div>
     <div class="card"><h2>${t("handover")}</h2><div class="muted" style="white-space:pre-line">${t("handoverText")}</div><div class="tiny">${t("about")}</div></div>
     <button class="btn danger" data-act="erase">${t("erase")}</button>
-    <div class="tiny" style="text-align:center">WorkAttend v1.1</div>
+    <div class="tiny" style="text-align:center">WorkAttend v1.2</div>
   </div>`;
 }
 
@@ -811,9 +811,11 @@ document.addEventListener("click", async ev => {
       if (!UI.msg.ar && !UI.msg.en && UI.msg.src.trim()) { if (isArabicText(UI.msg.src)) UI.msg.ar = UI.msg.src; else UI.msg.en = UI.msg.src; }
       const txt = hybridText(); if (!txt) { toast(t("emptyMsg")); return; }
       if (act === "copyMsg") return copyText(txt);
-      const date = UI.date;
+      /* Log first: on the web, opening wa.me leaves the page, so nothing after this line is guaranteed to run. */
+      put("messages", { id: uid("m"), date: UI.date, text: txt, createdAt: Date.now(), deletedAt: null });
+      resetMsg(); render();
+      try { if (Sync.enabled()) await Promise.race([Sync.run(), new Promise(r => setTimeout(r, 2500))]); } catch (e) {}
       openWhatsApp(txt);
-      setTimeout(() => confirmBox(t("didSend"), t("yesSent"), () => { put("messages", { id: uid("m"), date, text: txt, createdAt: Date.now(), deletedAt: null }); resetMsg(); render(); }, false, t("notYet")), 700);
       break; }
     case "reuseMsg": { const m = D.messages[id]; if (m) copyText(m.text); break; }
     case "exportCsv": exportMonthCsv(); break;
