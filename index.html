@@ -138,6 +138,8 @@ table.rep tr.click{cursor:pointer} table.rep tr.click:hover{background:var(--sur
    If the repo moves to a new owner, update this one line. */
 window.WEB_URL = window.WEB_URL || "https://dragonemprorx90.github.io/workattend/";
 /* Default shared database (Google Apps Script). A new owner can paste their own link in Settings. */
+/* Built-in PIN: must match Settings!B2 in the Sheet. Users never type it. */
+window.DEFAULT_PIN = window.DEFAULT_PIN || "WORK";
 window.DEFAULT_SERVER = window.DEFAULT_SERVER || "https://script.google.com/macros/s/AKfycby0Z9ezm-yLdMvlwc0RRTcEJ_HVbBcpxyXphD5r9nvgm3DIspVUBHy_5SG2CTVqhBbzoQ/exec";
 
 /* ================= constants & i18n ================= */
@@ -236,9 +238,13 @@ function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch
 function load(k, def) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? def : v; } catch (e) { return def; } }
 
 /* ================= state ================= */
-const DEF_SETTINGS = { lang: "auto", server: window.DEFAULT_SERVER || "", pin: "", setupDone: false, dest: "group", waNumber: "", cc: "971", defSummary: false };
+const DEF_SETTINGS = { lang: "auto", server: window.DEFAULT_SERVER || "", pin: window.DEFAULT_PIN || "", setupDone: !!window.DEFAULT_SERVER, dest: "group", waNumber: "", cc: "971", defSummary: false };
 const S = Object.assign({}, DEF_SETTINGS, load("wa.settings", {}));
-if (!S.server && window.DEFAULT_SERVER) S.server = window.DEFAULT_SERVER;
+if (!S.noAuto) {
+  if (!S.server && window.DEFAULT_SERVER) S.server = window.DEFAULT_SERVER;
+  if (!S.pin && window.DEFAULT_PIN) S.pin = window.DEFAULT_PIN;
+  if (!S.setupDone && S.server && S.pin) S.setupDone = true;
+}
 const D = Object.assign({ employees: {}, attendance: {}, messages: {} }, load("wa.data", {}));
 const DIRTY = Object.assign({ employees: {}, attendance: {}, messages: {} }, load("wa.dirty", {}));
 const META = Object.assign({ since: 0, lastSync: 0, err: "" }, load("wa.meta", {}));
@@ -352,6 +358,8 @@ function paintSync() { const d = $("#syncDot"); if (d) d.className = "sync-dot "
 function syncClass() { if (!Sync.enabled()) return ""; if (UI.syncing) return "busy"; return META.err ? "err" : "ok"; }
 
 /* ================= setup codes (portable between owners / devices) ================= */
+/* The PIN box only appears if the built-in PIN stops matching the server (owner changed it). */
+function pinField() { const v = UI.form ? UI.form.pin : (S.pin || window.DEFAULT_PIN || ""); return (META.err === "BAD_PIN" || UI.needPin) ? `<div class="field"><label for="sPin">${t("pin")}</label><input class="input" id="sPin" value="${esc(v)}" autocomplete="off"></div>` : `<input type="hidden" id="sPin" value="${esc(v)}">`; }
 function setupCode() { return btoa(unescape(encodeURIComponent(JSON.stringify({ u: S.server, p: S.pin })))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
 function readSetupCode(code) {
   try {
@@ -367,9 +375,9 @@ async function connect(server, pin) {
   server = String(server || "").trim(); pin = String(pin || "").trim();
   if (!/^https:\/\/script\.google(usercontent)?\.com\/.+\/exec(\?.*)?$/.test(server)) { toast(t("badUrl")); return false; }
   try { await Sync.api({ action: "check" }, server, pin); }
-  catch (e) { toast(errText(e)); return false; }
+  catch (e) { if (e.code === "BAD_PIN") UI.needPin = true; toast(errText(e)); render(); return false; }
   const changed = server !== S.server;
-  S.server = server; S.pin = pin; S.setupDone = true;
+  S.server = server; S.pin = pin; S.setupDone = true; S.noAuto = false; UI.needPin = false;
   if (changed) { META.since = 0; for (const tb of TABLES) for (const id of Object.keys(D[tb])) DIRTY[tb][id] = D[tb][id].updatedAt || Date.now(); }
   META.err = ""; saveAll();
   await Sync.run(); toast(t("connOk")); return true;
@@ -555,7 +563,7 @@ function viewSetup() {
     <div class="hero"><div class="big">${t("appName")}</div><div class="meta">${t("welcomeHint")}</div></div>
     <div class="card">
       <div class="field"><label for="sUrl">${t("serverUrl")}</label><input class="input ltr" id="sUrl" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(UI.form ? UI.form.url : S.server)}" autocomplete="off"></div>
-      <div class="field"><label for="sPin">${t("pin")}</label><input class="input" id="sPin" value="${esc(UI.form ? UI.form.pin : S.pin)}" autocomplete="off"></div>
+      ${pinField()}
       <button class="btn primary" data-act="connect">${t("connect")}</button>
       <div class="field"><label for="sCode">${t("orPaste")}</label><textarea class="input ltr" id="sCode" style="min-height:64px" placeholder="${t("setupCode")}"></textarea></div>
       <button class="btn tonal" data-act="applyCode">${t("pasteSetup")}</button>
@@ -660,7 +668,7 @@ function viewSettings() {
   return bar(t("settings"), "") + `<div class="scroll">
     <div class="card"><h2>${t("shared")}</h2>${status}
       <div class="field"><label for="sUrl">${t("serverUrl")}</label><input class="input ltr" id="sUrl" value="${esc(UI.form ? UI.form.url : S.server)}" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"></div>
-      <div class="field"><label for="sPin">${t("pin")}</label><input class="input" id="sPin" value="${esc(UI.form ? UI.form.pin : S.pin)}" autocomplete="off"></div>
+      ${pinField()}
       <div class="row"><button class="btn primary" data-act="connect">${t("connect")}</button>${conn ? `<button class="btn tonal" data-act="syncNow">${I.sync}${t("syncNow")}</button>` : ""}</div>
       ${conn ? `<button class="btn tonal" data-act="shareSetup">${t("shareSetup")}</button>` : ""}
       <button class="btn ghost" data-act="pasteSetupSheet">${t("pasteSetup")}</button>
@@ -679,7 +687,7 @@ function viewSettings() {
       <button class="btn ghost" data-act="restore">${t("restoreBackup")}</button></div>
     <div class="card"><h2>${t("handover")}</h2><div class="muted" style="white-space:pre-line">${t("handoverText")}</div><div class="tiny">${t("about")}</div></div>
     <button class="btn danger" data-act="erase">${t("erase")}</button>
-    <div class="tiny" style="text-align:center">WorkAttend v1.2</div>
+    <div class="tiny" style="text-align:center">WorkAttend v1.3</div>
   </div>`;
 }
 
@@ -831,7 +839,7 @@ document.addEventListener("click", async ev => {
       if (window.AndroidBridge && AndroidBridge.shareText) AndroidBridge.shareText(text);
       else if (navigator.share) { try { await navigator.share({ text }); } catch (e) {} } else copyText(text);
       break; }
-    case "disconnect": confirmBox(t("disconnect") + "?", t("disconnect"), () => { S.server = ""; S.pin = ""; META.since = 0; META.err = ""; saveAll(); render(); }, true); break;
+    case "disconnect": confirmBox(t("disconnect") + "?", t("disconnect"), () => { S.server = ""; S.pin = ""; S.noAuto = true; META.since = 0; META.err = ""; saveAll(); render(); }, true); break;
     case "dest": S.dest = v; saveAll(); render(); break;
     case "defSummary": S.defSummary = !S.defSummary; UI.msg.summary = S.defSummary; saveAll(); render(); break;
     case "lang": S.lang = v; saveAll(); render(); break;
