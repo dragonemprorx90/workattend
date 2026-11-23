@@ -18,7 +18,7 @@
   --ink:#101828; --ink-2:#475467; --ink-3:#8A94A6;
   --navy:#1D3F73; --navy-deep:#122B52; --navy-soft:#E4ECF9; --on-navy:#FFFFFF;
   --good:#1E7B4D; --good-soft:#E1F3E8; --warn:#A86A12; --warn-soft:#FBEFD6; --bad:#B8392A; --bad-soft:#FAE3DF;
-  --s-present:#1E7B4D; --s-absent:#B8392A; --s-sick:#C2620A; --s-leave:#2F5FB3; --s-annual:#0E7C86;
+  --s-present:#1E7B4D; --s-late:#7B4FB8; --s-absent:#B8392A; --s-sick:#C2620A; --s-leave:#2F5FB3; --s-annual:#0E7C86;
   --font:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Arabic","Geeza Pro",Tahoma,sans-serif;
   --r:16px; --shadow:0 1px 2px rgba(16,24,40,.06),0 8px 24px rgba(16,24,40,.06);
 }
@@ -27,7 +27,7 @@
   --ink:#EEF2F8; --ink-2:#B6C0D2; --ink-3:#7E8AA0;
   --navy:#3D6DB8; --navy-deep:#1E3A66; --navy-soft:#1E2E4A;
   --good:#5BC98C; --good-soft:#153826; --warn:#E0A94A; --warn-soft:#3B2C10; --bad:#F08A7C; --bad-soft:#3F1F1B;
-  --s-present:#2E9A63; --s-absent:#D4523F; --s-sick:#D9822B; --s-leave:#4C7FD6; --s-annual:#1E9AA5;
+  --s-present:#2E9A63; --s-late:#9A73D6; --s-absent:#D4523F; --s-sick:#D9822B; --s-leave:#4C7FD6; --s-annual:#1E9AA5;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35); color-scheme:dark } }
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
@@ -48,7 +48,9 @@ input,textarea,select{font:inherit;color:var(--ink)}
 .icon-btn:hover{background:var(--surface-2)}
 .icon-btn svg,.btn svg,.nav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 [dir="rtl"] .flip svg{transform:scaleX(-1)}
-.scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 16px 24px;display:flex;flex-direction:column;gap:12px}
+.scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;padding:4px 16px 24px;display:flex;flex-direction:column;gap:12px}
+.scroll>*{flex-shrink:0}
+.bar,.nav{flex-shrink:0}
 .nav{display:flex;border-top:1px solid var(--line);background:var(--surface);padding:6px 6px 10px}
 .nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:12px;font-size:11.5px;font-weight:700;color:var(--ink-3)}
 .nav button.on{color:var(--navy)} .nav button.on svg{stroke-width:2.3}
@@ -78,7 +80,7 @@ h2{font-size:16px;font-weight:800;margin:0}
 .hero .chip{background:rgba(255,255,255,.14);color:#fff}
 .chip b{font-variant-numeric:tabular-nums}
 .sw{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
-.c-present{background:var(--s-present)} .c-absent{background:var(--s-absent)} .c-sick{background:var(--s-sick)} .c-leave{background:var(--s-leave)} .c-annual{background:var(--s-annual)} .c-none{background:var(--ink-3)}
+.c-present{background:var(--s-present)} .c-late{background:var(--s-late)} .c-absent{background:var(--s-absent)} .c-sick{background:var(--s-sick)} .c-leave{background:var(--s-leave)} .c-annual{background:var(--s-annual)} .c-none{background:var(--ink-3)}
 .field{display:flex;flex-direction:column;gap:6px}
 .field label{font-size:12.5px;font-weight:800;color:var(--ink-2)}
 .input{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:11px 13px;min-height:46px;font-size:15px}
@@ -90,10 +92,10 @@ textarea.input{min-height:110px;resize:vertical;line-height:1.55}
 .att:last-child{border-bottom:0}
 .att .n{display:flex;align-items:center;gap:8px;font-weight:800}
 .att .n .s{font-weight:600;color:var(--ink-3);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.st5{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
-.st5 button{min-height:40px;border-radius:10px;font-weight:800;font-size:12.5px;background:var(--surface-2);color:var(--ink-2);padding:0 2px;line-height:1.15}
+.st5{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px}
+.st5 button{min-height:40px;border-radius:10px;font-weight:800;font-size:11.5px;background:var(--surface-2);color:var(--ink-2);padding:0 2px;line-height:1.15}
 .st5 button.on{color:#fff}
-.st5 button.on.present{background:var(--s-present)} .st5 button.on.absent{background:var(--s-absent)} .st5 button.on.sick{background:var(--s-sick)} .st5 button.on.leave{background:var(--s-leave)} .st5 button.on.annual{background:var(--s-annual)}
+.st5 button.on.present{background:var(--s-present)} .st5 button.on.late{background:var(--s-late)} .st5 button.on.absent{background:var(--s-absent)} .st5 button.on.sick{background:var(--s-sick)} .st5 button.on.leave{background:var(--s-leave)} .st5 button.on.annual{background:var(--s-annual)}
 .toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0;width:100%;text-align:start}
 .switch{width:46px;height:28px;border-radius:999px;background:var(--line);position:relative;flex:none;transition:background .15s}
 .switch::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
@@ -108,7 +110,7 @@ textarea.input{min-height:110px;resize:vertical;line-height:1.55}
 @media (prefers-reduced-motion:reduce){.sheet,.toast{animation:none}}
 .wa-prev{background:#0b141a;border-radius:14px;padding:12px;border:1px solid #1f2c34}
 .wa-prev .bubble{background:#005c4b;color:#e9edef;border-radius:10px;padding:9px 11px;font-size:14px;white-space:pre-wrap;line-height:1.5;unicode-bidi:plaintext;text-align:start}
-.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.grid5{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .stat{background:var(--surface-2);border-radius:12px;padding:9px 4px;text-align:center}
 .stat b{display:block;font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
 .stat span{font-size:11px;color:var(--ink-3);font-weight:800}
@@ -143,9 +145,10 @@ window.DEFAULT_PIN = window.DEFAULT_PIN || "WORK";
 window.DEFAULT_SERVER = window.DEFAULT_SERVER || "https://script.google.com/macros/s/AKfycby0Z9ezm-yLdMvlwc0RRTcEJ_HVbBcpxyXphD5r9nvgm3DIspVUBHy_5SG2CTVqhBbzoQ/exec";
 
 /* ================= constants & i18n ================= */
-const STATUSES = ["present","absent","sick","leave","annual"];
+const STATUSES = ["present","late","absent","sick","leave","annual"];
 const ST = {
   present:{ar:"حضور",en:"Present",icon:"✅"},
+  late:{ar:"تأخير",en:"Late",icon:"⏰"},
   absent:{ar:"غياب",en:"Absent",icon:"❌"},
   sick:{ar:"مرضية",en:"Sick leave",short:"Sick",icon:"🤒"},
   leave:{ar:"إجازة",en:"Leave",icon:"📅"},
@@ -267,8 +270,8 @@ function setAtt(date, emp, status) {
   put("attendance", Object.assign({}, old, { status: status || null, empName: emp.name, deletedAt: null }));
 }
 function dayCounts(date) {
-  const c = { present: 0, absent: 0, sick: 0, leave: 0, annual: 0, none: 0 };
-  const names = { present: [], absent: [], sick: [], leave: [], annual: [] };
+  const c = { present: 0, late: 0, absent: 0, sick: 0, leave: 0, annual: 0, none: 0 };
+  const names = { present: [], late: [], absent: [], sick: [], leave: [], annual: [] };
   for (const e of employees()) { const s = attOf(date, e.id); if (s) { c[s]++; names[s].push(e.name); } else c.none++; }
   return { c, names };
 }
@@ -544,12 +547,15 @@ const I = {
 /* ================= rendering ================= */
 function render() {
   const app = $("#app"), l = lang();
+  /* keep the scroll position across re-renders (tapping a status must not jump the list to the top) */
+  const prevSc = $(".scroll"), keepTop = prevSc && UI.lastTab === UI.tab ? prevSc.scrollTop : 0; UI.lastTab = UI.tab;
   document.documentElement.lang = l; document.documentElement.dir = l === "ar" ? "rtl" : "ltr";
   const toastHtml = UI.toast ? `<div class="toast" role="status">${esc(UI.toast)}</div>` : "";
   if (!S.setupDone) { app.innerHTML = viewSetup() + (UI.overlay ? viewOverlay() : "") + toastHtml; return bindAfter(); }
   const tabs = ["today", "people", "msg", "reports", "settings"];
   const screen = { today: viewToday, people: viewPeople, msg: viewMsg, reports: viewReports, settings: viewSettings }[UI.tab]();
   app.innerHTML = screen + `<nav class="nav">${tabs.map(tb => `<button data-act="tab" data-v="${tb}" class="${UI.tab === tb ? "on" : ""}" aria-current="${UI.tab === tb ? "page" : "false"}">${I[tb]}<span>${t(tb)}</span></button>`).join("")}</nav>` + (UI.overlay ? viewOverlay() : "") + toastHtml;
+  if (keepTop) { const sc = $(".scroll"); if (sc) sc.scrollTop = keepTop; }
   bindAfter();
 }
 function bar(title, sub, extra = "") {
@@ -637,7 +643,7 @@ function viewMsg() {
 
 function monthData(m) {
   const rows = Object.values(D.attendance).filter(a => !a.deletedAt && a.status && a.date && a.date.startsWith(m));
-  const z = () => ({ present: 0, absent: 0, sick: 0, leave: 0, annual: 0 });
+  const z = () => ({ present: 0, late: 0, absent: 0, sick: 0, leave: 0, annual: 0 });
   const byEmp = {}, byDay = {}, tot = z();
   for (const r of rows) { tot[r.status]++; (byEmp[r.empId] = byEmp[r.empId] || z())[r.status]++; (byDay[r.date] = byDay[r.date] || z())[r.status]++; }
   return { rows, byEmp, byDay, tot };
@@ -687,7 +693,7 @@ function viewSettings() {
       <button class="btn ghost" data-act="restore">${t("restoreBackup")}</button></div>
     <div class="card"><h2>${t("handover")}</h2><div class="muted" style="white-space:pre-line">${t("handoverText")}</div><div class="tiny">${t("about")}</div></div>
     <button class="btn danger" data-act="erase">${t("erase")}</button>
-    <div class="tiny" style="text-align:center">WorkAttend v1.3</div>
+    <div class="tiny" style="text-align:center">WorkAttend v1.4</div>
   </div>`;
 }
 

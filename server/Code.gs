@@ -29,7 +29,7 @@ var KEY_OF = { employees: 'Employees', attendance: 'Attendance', messages: 'Mess
 var NUMERIC = { createdAt: 1, updatedAt: 1, deletedAt: 1, srv: 1 };
 var STATUS_LABEL = {
   present: 'حضور / Present', absent: 'غياب / Absent', sick: 'مرضية / Sick leave',
-  leave: 'إجازة / Leave', annual: 'سنوية / Annual leave'
+  leave: 'إجازة / Leave', annual: 'سنوية / Annual leave', late: 'تأخير / Late'
 };
 
 /* ---------- setup ---------- */
@@ -114,7 +114,7 @@ function sync_(body) {
     var changed = false, appended = [];
     (push[key] || []).forEach(function (r) {
       if (!r || !r.id) return;
-      if (key === 'attendance') r.statusLabel = STATUS_LABEL[r.status] || '';
+      if (key === 'attendance') r.statusLabel = STATUS_LABEL[r.status] || r.status || '';
       var row = cols.map(function (c) {
         if (c === 'srv') return String(now);
         var v = r[c];
