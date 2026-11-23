@@ -601,7 +601,6 @@ function viewToday() {
     <div class="list">${list.map(e => { const s = attOf(d, e.id); return `<div class="att">
       <div class="n"><span class="sw c-${s || "none"}"></span><span>${esc(e.name)}</span><span class="s">${esc([e.title, e.dept].filter(Boolean).join(" · "))}</span></div>
       <div class="st5" role="group" aria-label="${esc(e.name)}">${STATUSES.map(x => `<button data-act="mark" data-id="${esc(e.id)}" data-v="${x}" class="${x} ${s === x ? "on" : ""}" aria-pressed="${s === x}">${stLabel(x)}</button>`).join("")}</div></div>`; }).join("")}</div>
-    <button class="btn wa" data-act="toMsgSummary">${I.wa}${t("sendSummary")}</button>
   </div>`;
 }
 
@@ -693,7 +692,7 @@ function viewSettings() {
       <button class="btn ghost" data-act="restore">${t("restoreBackup")}</button></div>
     <div class="card"><h2>${t("handover")}</h2><div class="muted" style="white-space:pre-line">${t("handoverText")}</div><div class="tiny">${t("about")}</div></div>
     <button class="btn danger" data-act="erase">${t("erase")}</button>
-    <div class="tiny" style="text-align:center">WorkAttend v1.4</div>
+    <div class="tiny" style="text-align:center">WorkAttend v1.5</div>
   </div>`;
 }
 
